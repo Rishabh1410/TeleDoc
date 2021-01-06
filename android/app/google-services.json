@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "298283407872",
+    "project_id": "teledoc-7127c",
+    "storage_bucket": "teledoc-7127c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298283407872:android:8a54f7194e822e082a96e5",
+        "android_client_info": {
+          "package_name": "com.healthcare.teledoc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298283407872-fb6af7fip42tirpb90h9lg7lc8fg005q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.healthcare.teledoc",
+            "certificate_hash": "9f246e0682e543cfe20dc5d56f0dd5f91dce4987"
+          }
+        },
+        {
+          "client_id": "298283407872-gi3i89j5ef6navg68ldq9t541q74prdn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBLRSIlSf2mzf0eMV00n9XcC8EleI8Njs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298283407872-gi3i89j5ef6navg68ldq9t541q74prdn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
