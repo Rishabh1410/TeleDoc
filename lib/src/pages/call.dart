@@ -4,8 +4,11 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:flutter/material.dart';
+import 'package:TeleDoc/src/utils/settings.dart';
 
-import '../utils/settings.dart';
+// const APP_ID = '48977aeb5abe4b09b4ffcb004f36cda5';
+// const Token =
+//     '00648977aeb5abe4b09b4ffcb004f36cda5IAB4anX6Sytxe0dYcp6qVyy+NLw6F58OgEJaMKfeEHfdPO9mJh8AAAAAEACZqwdIMwv4XwEAAQAzC/hf';
 
 class CallPage extends StatefulWidget {
   /// non-modifiable channel name of the page
@@ -41,10 +44,16 @@ class _CallPageState extends State<CallPage> {
   void initState() {
     super.initState();
     // initialize agora sdk
-    initialize();
+    print("-1");
+    try {
+      initialize();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> initialize() async {
+    print("success 1");
     if (APP_ID.isEmpty) {
       setState(() {
         _infoStrings.add(
@@ -54,8 +63,13 @@ class _CallPageState extends State<CallPage> {
       });
       return;
     }
-
+    print("success 2");
+    try{
     await _initAgoraRtcEngine();
+    }
+    catch(e){
+      print(e);
+    }
     _addAgoraEventHandlers();
     await _engine.enableWebSdkInteroperability(true);
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
@@ -66,6 +80,7 @@ class _CallPageState extends State<CallPage> {
 
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
+    print("success 3");
     _engine = await RtcEngine.create(APP_ID);
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
@@ -74,6 +89,7 @@ class _CallPageState extends State<CallPage> {
 
   /// Add agora event handlers
   void _addAgoraEventHandlers() {
+    print("success 4");
     _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
       setState(() {
         final info = 'onError: $code';
@@ -137,6 +153,7 @@ class _CallPageState extends State<CallPage> {
   /// Video layout wrapper
   Widget _viewRows() {
     final views = _getRenderViews();
+    print(views);
     switch (views.length) {
       case 1:
         return Container(
@@ -174,6 +191,7 @@ class _CallPageState extends State<CallPage> {
 
   /// Toolbar layout
   Widget _toolbar() {
+    print('success 6');
     if (widget.role == ClientRole.Audience) return Container();
     return Container(
       alignment: Alignment.bottomCenter,
@@ -224,6 +242,7 @@ class _CallPageState extends State<CallPage> {
 
   /// Info panel to show logs
   Widget _panel() {
+    print("success 5");
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 48),
       alignment: Alignment.bottomCenter,
@@ -289,6 +308,7 @@ class _CallPageState extends State<CallPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("success 0");
     return Scaffold(
       appBar: AppBar(
         title: Text('Agora Flutter QuickStart'),

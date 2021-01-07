@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 
 import 'dart:convert';
@@ -14,7 +16,7 @@ class DoctorReg extends StatefulWidget {
 
 class _DoctorRegState extends State<DoctorReg> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
-  PickedFile _imageFile;
+  File _imageFile;
   final ImagePicker _picker = ImagePicker();
 
   TextEditingController age_controller,
@@ -106,9 +108,7 @@ class _DoctorRegState extends State<DoctorReg> {
                 children: <Widget>[
                   CircleAvatar(
                       radius: 60,
-                      backgroundImage: _imageFile == null
-                          ? AssetImage('assets/images/default_image.png')
-                          : _imageFile),
+                      backgroundImage: _imageFile == null? AssetImage("assets/Image/default_image.png"): FileImage(File(_imageFile.path))),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     FlatButton.icon(
                       icon: Icon(Icons.camera),
@@ -270,9 +270,9 @@ class _DoctorRegState extends State<DoctorReg> {
   }
 
   Future TakeImage(ImageSource source) async {
-    final PickedFile pickedFile = await _picker.getImage(source: source);
+    final PickedFile = await _picker.getImage(source: source);
     setState(() {
-      _imageFile = pickedFile;
+      _imageFile = File(PickedFile.path);
     });
   }
 }
