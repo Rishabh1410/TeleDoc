@@ -15,7 +15,7 @@ class Patient_cards extends StatefulWidget {
 class _Patient_cardsState extends State<Patient_cards> {
   Map<String, dynamic> jsonvalue;
 
-  Future<Map<String, dynamic>> cardvalue() async {
+  Future<Map<String, dynamic>> cardvalue(var pat_Id) async {
     Map<String, dynamic> pat_id = {'id': 78};
     final http.Response patientValue = await http.post(
         'http://54.87.169.52:5000/get',
@@ -42,6 +42,7 @@ class _Patient_cardsState extends State<Patient_cards> {
 
   @override
   Widget build(BuildContext context) {
+    var pat_Id = ModalRoute.of(context).settings.arguments;
     return Scaffold(
         body: Container(
       //color: Colors.white,
@@ -126,7 +127,7 @@ class _Patient_cardsState extends State<Patient_cards> {
 //all the cards showing data
 
             FutureBuilder(
-                future: cardvalue(),
+                future: cardvalue(pat_Id),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.data == null) {
                     return Container(
@@ -258,7 +259,65 @@ class _Patient_cardsState extends State<Patient_cards> {
                             ),
                           ),
                         ],
-                      )
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Card(
+                              color: Color.fromRGBO(147, 112, 255, 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: InkWell(
+                                splashColor: Colors.blue.withAlpha(30),
+                                onTap: () {},
+                                child: Container(
+                                  child: Center(
+                                    child: Text(
+                                      '${snapshot.data['Respiration Rate']}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30),
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50)),
+                                  width: 150,
+                                  height: 200,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Card(
+                              color: Color.fromRGBO(185, 126, 255, 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: InkWell(
+                                splashColor: Colors.blue.withAlpha(30),
+                                onTap: () {},
+                                child: Container(
+                                  child: Center(
+                                    child: Text(
+                                      '${snapshot.data['Blood Glucose']}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30),
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50)),
+                                  width: 150,
+                                  height: 200,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 }),

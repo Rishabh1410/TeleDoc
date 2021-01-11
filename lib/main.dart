@@ -1,16 +1,32 @@
+import 'package:TeleDoc/registration/login.dart';
 import 'package:flutter/material.dart';
-import 'package:TeleDoc/registration/docotr_registration.dart';
+//import 'package:TeleDoc/registration/docotr_registration.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:TeleDoc/pages/doc_dashboard.dart';
 import 'package:TeleDoc/pages/patient_dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:TeleDoc/local_data/data.dart';
+import 'package:TeleDoc/registration/login.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    //Id = getData('doc_Id');
+  }
+
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  //Future<dynamic> Id = getData('doc_Id');
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -28,7 +44,8 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: "teledoc",
             routes: {
-              '/reg': (context) => DoctorReg(),
+              '/login': (context) => login_page(),
+              //'/reg': (context) => DoctorReg(),
               '/dashboard': (context) => Timeline(),
               '/patients': (context) => Patient_cards(),
             },
@@ -78,7 +95,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 RawMaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/dashboard');
+                    del_data('doc_Id');
+                    //Navigator.pushNamed(context, '/dashboard');
                   },
                   elevation: 5.0,
                   fillColor: Colors.white,
@@ -93,8 +111,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 10,
                 ),
                 RawMaterialButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/reg');
+                  onPressed: () async {
+                    if ((await getData('doc_Id')) == null) {
+                      Navigator.pushNamed(context, '/login');
+                    } else {
+                      print(await getData('doc_Id'));
+                      Navigator.pushNamed(context, '/dashboard');
+                    }
                   },
                   elevation: 5.0,
                   fillColor: Colors.white,

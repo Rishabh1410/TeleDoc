@@ -108,7 +108,9 @@ class _DoctorRegState extends State<DoctorReg> {
                 children: <Widget>[
                   CircleAvatar(
                       radius: 60,
-                      backgroundImage: _imageFile == null? AssetImage("assets/Image/default_image.png"): FileImage(File(_imageFile.path))),
+                      backgroundImage: _imageFile == null
+                          ? AssetImage("assets/Image/default_image.png")
+                          : FileImage(File(_imageFile.path))),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     FlatButton.icon(
                       icon: Icon(Icons.camera),

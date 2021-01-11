@@ -84,6 +84,8 @@ class _TimelineState extends State<Timeline> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => Patient_cards(),
+                              settings: RouteSettings(
+                                  arguments: snapshot.data[index][1]),
                               fullscreenDialog: true))
                     },
                   ),

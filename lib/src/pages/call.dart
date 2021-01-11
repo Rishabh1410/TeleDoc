@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
@@ -64,10 +63,9 @@ class _CallPageState extends State<CallPage> {
       return;
     }
     print("success 2");
-    try{
-    await _initAgoraRtcEngine();
-    }
-    catch(e){
+    try {
+      await _initAgoraRtcEngine();
+    } catch (e) {
       print(e);
     }
     _addAgoraEventHandlers();
@@ -300,6 +298,10 @@ class _CallPageState extends State<CallPage> {
       muted = !muted;
     });
     _engine.muteLocalAudioStream(muted);
+  }
+
+  void _ofCamera() {
+    _engine.muteLocalVideoStream(muted);
   }
 
   void _onSwitchCamera() {
