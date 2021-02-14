@@ -36,10 +36,14 @@ dependencies:
   flutter_better_camera: ^0.6.1
   path_provider: ^1.6.24
   video_player: ^1.0.1
-  permission_handler: ^5.0.1+1
+  permission_handler: ^5.0.1+2
   image_gallery_saver: ^1.6.7
   path:
   shared_preferences: ^0.5.12+4
+  firebase_messaging: ^7.0.3
+  flutter_ringtone_player: ^2.0.0
+  cloud_firestore: ^0.14.4
+
 
 
   # The following adds the Cupertino Icons font to your application.

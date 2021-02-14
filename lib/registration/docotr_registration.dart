@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:TeleDoc/registration/login.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:convert';
@@ -88,7 +89,7 @@ class _DoctorRegState extends State<DoctorReg> {
     } else {
       // If the server did not return a 201 CREATED response,
       // then throw an exception.
-      throw Exception('Failed to load album');
+      throw Exception('Failed to upload data');
     }
   }
 
@@ -102,7 +103,8 @@ class _DoctorRegState extends State<DoctorReg> {
         padding: EdgeInsets.all(20.0),
         child: Center(
           child: Form(
-              autovalidate: true,
+              autovalidateMode: AutovalidateMode.always,
+              //autovalidate: true,   //because it was depricated
               key: formkey,
               child: ListView(
                 children: <Widget>[
@@ -258,7 +260,12 @@ class _DoctorRegState extends State<DoctorReg> {
                     color: Color.fromRGBO(148, 113, 254, 1),
                     onPressed: () {
                       Map json = create_map();
-                      create_post(json);
+                      create_post(json).then((value) =>
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => login_page(),
+                                  fullscreenDialog: true)));
                     },
                   ),
                   SizedBox(

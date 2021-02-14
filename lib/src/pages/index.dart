@@ -19,6 +19,11 @@ class IndexState extends State<IndexPage> {
   bool _validateError = false;
 
   ClientRole _role = ClientRole.Broadcaster;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -114,8 +119,8 @@ class IndexState extends State<IndexPage> {
     });
     if (_channelController.text.isNotEmpty) {
       // await for camera and mic permissions before pushing video page
-      await _handleCameraAndMic(Permission.camera);
-      await _handleCameraAndMic(Permission.microphone);
+      // await _handleCameraAndMic(Permission.camera);
+      // await _handleCameraAndMic(Permission.microphone);
       // push video page with given channel name
       await Navigator.push(
         context,

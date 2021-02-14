@@ -15,9 +15,11 @@ class CallPage extends StatefulWidget {
 
   /// non-modifiable client role of the page
   final ClientRole role;
+  final token;
 
   /// Creates a call page with given channel name.
-  const CallPage({Key key, this.channelName, this.role}) : super(key: key);
+  const CallPage({Key key, this.channelName, this.role, this.token})
+      : super(key: key);
 
   @override
   _CallPageState createState() => _CallPageState();
@@ -73,7 +75,7 @@ class _CallPageState extends State<CallPage> {
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
     configuration.dimensions = VideoDimensions(1920, 1080);
     await _engine.setVideoEncoderConfiguration(configuration);
-    await _engine.joinChannel(Token, widget.channelName, null, 0);
+    await _engine.joinChannel(widget.token, widget.channelName, null, 0);
   }
 
   /// Create agora sdk instance and initialize

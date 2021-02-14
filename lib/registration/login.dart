@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:TeleDoc/local_data/data.dart';
 import 'package:TeleDoc/pages/doc_dashboard.dart';
 import 'package:TeleDoc/registration/docotr_registration.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class login_page extends StatefulWidget {
   login_page({Key key}) : super(key: key);
@@ -27,6 +28,14 @@ class _login_pageState extends State<login_page> {
 
     return auth_data[0][5].toString();
   }
+  /*@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _firebasemessaging.getToken().then((token) {
+      print(token); // Print the Token in Console
+    });
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +75,7 @@ class _login_pageState extends State<login_page> {
                         if (value == pass.text) {
                           print('1');
                           init('doc_Id', doc_Id.text);
-                          Navigator.push(
+                          Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => Timeline(),

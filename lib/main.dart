@@ -1,12 +1,15 @@
 import 'package:TeleDoc/registration/login.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 //import 'package:TeleDoc/registration/docotr_registration.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:TeleDoc/pages/doc_dashboard.dart';
 import 'package:TeleDoc/pages/patient_dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:TeleDoc/local_data/data.dart';
-import 'package:TeleDoc/registration/login.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +22,67 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  FirebaseMessaging _firebasemessaging = FirebaseMessaging();
+  Future<void> authentication(String token) async {
+    Map post_data = {'User': '2', 'Doctor_Id': '5437', 'deviceToken': '$token'};
+    http.Response check = await http.post('http://54.87.169.52:5000/signin',
+        body: jsonEncode(post_data),
+        headers: {"content-type": "application/json"});
+    var auth_data = jsonDecode(check.body);
+    print(auth_data[0][5].toString());
+
+    //return auth_data[0][5].toString();
+  }
+
   @override
   void initState() {
     super.initState();
+    _firebasemessaging.getToken().then((token) {
+      print(token);
+      authentication(token); // Print the Token in Console
+    });
     //Id = getData('doc_Id');
+    _firebasemessaging.configure(onMessage: (message) async {
+      print(message.runtimeType);
+      print("1");
+      print(message['notification']['body']);
+
+      await init("channel", "${message['notification']['body']['clinic_id']}");
+      await init("token", "${message['notification']['token']}");
+      FlutterRingtonePlayer.play(
+        android: AndroidSounds.notification,
+        ios: IosSounds.bell,
+        //looping: true,
+        volume: 1.0,
+      );
+      //print(message);
+    }, onResume: (message) async {
+      print("2");
+      print(message['notification']);
+
+      await init("channel", "${message['notification']['body']['clinic_id']}");
+      await init("token", "${message['notification']['token']}");
+
+      FlutterRingtonePlayer.play(
+        android: AndroidSounds.notification,
+        ios: IosSounds.bell,
+        //looping: true,
+        volume: 1.0,
+      );
+    }, onLaunch: (message) async {
+      print("3");
+      print(message['notification']['body']);
+
+      await init("channel", "${message['notification']['body']['clinic_id']}");
+      await init("token", "${message['notification']['token']}");
+
+      FlutterRingtonePlayer.play(
+        android: AndroidSounds.notification,
+        ios: IosSounds.bell,
+        //looping: true,
+        volume: 1.0,
+      );
+    });
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
@@ -41,7 +101,6 @@ class _MyAppState extends State<MyApp> {
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
             title: "teledoc",
             routes: {
               '/login': (context) => login_page(),

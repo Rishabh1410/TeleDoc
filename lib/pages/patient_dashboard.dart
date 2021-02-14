@@ -1,9 +1,15 @@
+import 'dart:async';
+import 'package:TeleDoc/local_data/data.dart';
+import 'package:TeleDoc/src/pages/call.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:cupertino_icons/cupertino_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:TeleDoc/src/pages/index.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Patient_cards extends StatefulWidget {
   Patient_cards({Key key}) : super(key: key);
@@ -13,7 +19,20 @@ class Patient_cards extends StatefulWidget {
 }
 
 class _Patient_cardsState extends State<Patient_cards> {
+  final _channelController = TextEditingController();
+  var channel = null;
+  var token = null;
+
+  /// if channel textField is validated to have error
+  bool _validateError = false;
   Map<String, dynamic> jsonvalue;
+
+  //made stream controller to get a stream of data
+  //StreamController _flow = StreamController();
+  Future<void> fetch_data() async {
+    channel = await getData('channel');
+    token = await getData('token');
+  }
 
   Future<Map<String, dynamic>> cardvalue(var pat_Id) async {
     Map<String, dynamic> pat_id = {'id': 78};
@@ -34,9 +53,20 @@ class _Patient_cardsState extends State<Patient_cards> {
     return jsonvalue;
   }
 
+  Future<void> getId() async {
+    var classId = FirebaseFirestore.instance;
+    var value = await classId.doc('user').snapshots().first;
+    print("class Id is $value");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   void dispose() {
-    // TODO: implement dispose
+    //TODO: implement dispose
     super.dispose();
   }
 
@@ -72,12 +102,9 @@ class _Patient_cardsState extends State<Patient_cards> {
                   semanticLabel: 'call',
                 ),
                 tooltip: 'video call your patient',
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => IndexPage(),
-                          fullscreenDialog: true));
+                onPressed: () async {
+                  //await getId();
+                  fetch_data().then((value) => onJoin(channel, token));
                 },
               ),
               title: Text('data'),
@@ -95,7 +122,8 @@ class _Patient_cardsState extends State<Patient_cards> {
             ),
 
             Card(
-              color: Color.fromRGBO(245, 246, 250, 1),
+              color: Colors.blueAccent,
+              //Color.fromRGBO(245, 246, 250, 1),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
               ),
@@ -127,7 +155,9 @@ class _Patient_cardsState extends State<Patient_cards> {
 //all the cards showing data
 
             FutureBuilder(
+                //StreamBuilder(
                 future: cardvalue(pat_Id),
+                //stream:
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.data == null) {
                     return Container(
@@ -148,7 +178,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                         children: [
                           Expanded(
                             child: Card(
-                              color: Color.fromRGBO(147, 112, 255, 1),
+                              color: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -175,7 +205,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                           ),
                           Expanded(
                             child: Card(
-                              color: Color.fromRGBO(185, 126, 255, 1),
+                              color: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -206,7 +236,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                         children: [
                           Expanded(
                             child: Card(
-                              color: Color.fromRGBO(185, 226, 255, 1),
+                              color: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -233,7 +263,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                           ),
                           Expanded(
                             child: Card(
-                              color: Color.fromRGBO(75, 87, 132, 1),
+                              color: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -264,7 +294,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                         children: [
                           Expanded(
                             child: Card(
-                              color: Color.fromRGBO(147, 112, 255, 1),
+                              color: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -291,7 +321,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                           ),
                           Expanded(
                             child: Card(
-                              color: Color.fromRGBO(185, 126, 255, 1),
+                              color: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -362,5 +392,35 @@ class _Patient_cardsState extends State<Patient_cards> {
     //       ],
     //     ),
     //   );
+  }
+
+  Future<void> onJoin(String channel, String token) async {
+    // update input validation
+    setState(() {
+      _channelController.text.isEmpty
+          ? _validateError = true
+          : _validateError = false;
+    });
+    if (channel != null) {
+      // await for camera and mic permissions before pushing video page
+      //  await _handleCameraAndMic(Permission.camera);
+      //  await _handleCameraAndMic(Permission.microphone);
+      // push video page with given channel name
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CallPage(
+              channelName: _channelController.text,
+              role: ClientRole.Broadcaster,
+              token: token),
+        ),
+      );
+    }
+    else {print("cant connect video call");}
+  }
+
+  Future<void> _handleCameraAndMic(Permission permission) async {
+    final status = await permission.request();
+    print(status);
   }
 }

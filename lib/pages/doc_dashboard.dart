@@ -38,15 +38,19 @@ class _TimelineState extends State<Timeline> {
             );
           }
           return ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             controller: scroller,
             itemCount: snapshot.data.length,
             itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
+              return
+                  // Padding(
+                  //   padding: const EdgeInsets.all(5.0),
+                  //   child:
+                  Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
                   child: ListTile(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
@@ -69,6 +73,11 @@ class _TimelineState extends State<Timeline> {
                         ),
                       ],
                     ),
+                    trailing: (IconButton(
+                      icon: Icon(Icons.menu),
+                      iconSize: 40,
+                      onPressed: () {},
+                    )),
                     title: Text('${snapshot.data[index][1]}',
                         style: TextStyle(
                             color: Colors.black,
@@ -91,6 +100,7 @@ class _TimelineState extends State<Timeline> {
                   ),
                 ),
               );
+              //);
             },
           );
         });
@@ -213,8 +223,8 @@ class _TimelineState extends State<Timeline> {
                   height: MediaQuery.of(context).size.height * 1,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular((50)),
-                          topRight: Radius.circular(50),
+                          topLeft: Radius.circular((25)),
+                          topRight: Radius.circular(25),
                           bottomRight: Radius.circular(0)),
                       color: Color.fromRGBO(148, 113, 254, 1)),
                   child: value
