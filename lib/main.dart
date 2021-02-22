@@ -7,12 +7,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:TeleDoc/pages/doc_dashboard.dart';
 import 'package:TeleDoc/pages/patient_dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:TeleDoc/local_data/data.dart';
+//import 'package:TeleDoc/local_data/data.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
-void main() {
+SharedPreferences pref;
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  pref = await SharedPreferences.getInstance();
+
   runApp(MyApp());
 }
 
@@ -22,6 +25,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  var mssg;
   FirebaseMessaging _firebasemessaging = FirebaseMessaging();
   Future<void> authentication(String token) async {
     Map post_data = {'User': '2', 'Doctor_Id': '5437', 'deviceToken': '$token'};
@@ -43,12 +47,12 @@ class _MyAppState extends State<MyApp> {
     });
     //Id = getData('doc_Id');
     _firebasemessaging.configure(onMessage: (message) async {
-      print(message.runtimeType);
       print("1");
-      print(message['notification']['body']);
+      mssg = message['notification']['body'];
+      print(mssg);
 
-      await init("channel", "${message['notification']['body']['clinic_id']}");
-      await init("token", "${message['notification']['token']}");
+      pref.setString("channel", "${mssg.substring(44, 49)}");
+      pref.setString("token", "${mssg.substring(58)}");
       FlutterRingtonePlayer.play(
         android: AndroidSounds.notification,
         ios: IosSounds.bell,
@@ -58,11 +62,11 @@ class _MyAppState extends State<MyApp> {
       //print(message);
     }, onResume: (message) async {
       print("2");
-      print(message['notification']);
+      mssg = message['notification']['body'];
+      print(mssg);
 
-      await init("channel", "${message['notification']['body']['clinic_id']}");
-      await init("token", "${message['notification']['token']}");
-
+      pref.setString("channel", "${mssg.substring(44, 49)}");
+      pref.setString("token", "${mssg.substring(58)}");
       FlutterRingtonePlayer.play(
         android: AndroidSounds.notification,
         ios: IosSounds.bell,
@@ -71,10 +75,11 @@ class _MyAppState extends State<MyApp> {
       );
     }, onLaunch: (message) async {
       print("3");
-      print(message['notification']['body']);
+      mssg = message['notification']['body'];
+      print(mssg);
 
-      await init("channel", "${message['notification']['body']['clinic_id']}");
-      await init("token", "${message['notification']['token']}");
+      pref.setString("channel", "${mssg.substring(44, 49)}");
+      pref.setString("token", "${mssg.substring(58)}");
 
       FlutterRingtonePlayer.play(
         android: AndroidSounds.notification,
@@ -154,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 RawMaterialButton(
                   onPressed: () {
-                    del_data('doc_Id');
+                    pref.remove('doc_Id');
                     //Navigator.pushNamed(context, '/dashboard');
                   },
                   elevation: 5.0,
@@ -171,10 +176,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 RawMaterialButton(
                   onPressed: () async {
-                    if ((await getData('doc_Id')) == null) {
+                    if ((pref.getString('doc_Id')) == null) {
                       Navigator.pushNamed(context, '/login');
                     } else {
-                      print(await getData('doc_Id'));
+                      print(pref.getString('doc_Id'));
                       Navigator.pushNamed(context, '/dashboard');
                     }
                   },

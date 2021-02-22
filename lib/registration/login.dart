@@ -2,10 +2,11 @@ import 'dart:convert';
 //import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:TeleDoc/local_data/data.dart';
+//import 'package:TeleDoc/local_data/data.dart';
 import 'package:TeleDoc/pages/doc_dashboard.dart';
 import 'package:TeleDoc/registration/docotr_registration.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:TeleDoc/main.dart';
 
 class login_page extends StatefulWidget {
   login_page({Key key}) : super(key: key);
@@ -74,7 +75,7 @@ class _login_pageState extends State<login_page> {
                       auth.then((value) {
                         if (value == pass.text) {
                           print('1');
-                          init('doc_Id', doc_Id.text);
+                          pref.setString('doc_Id', doc_Id.text);
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(

@@ -11,11 +11,11 @@ import 'package:TeleDoc/src/utils/settings.dart';
 
 class CallPage extends StatefulWidget {
   /// non-modifiable channel name of the page
-  final String channelName;
+  final channelName;
 
   /// non-modifiable client role of the page
   final ClientRole role;
-  final token;
+  final String token;
 
   /// Creates a call page with given channel name.
   const CallPage({Key key, this.channelName, this.role, this.token})
@@ -75,6 +75,7 @@ class _CallPageState extends State<CallPage> {
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
     configuration.dimensions = VideoDimensions(1920, 1080);
     await _engine.setVideoEncoderConfiguration(configuration);
+    print(widget.token);
     await _engine.joinChannel(widget.token, widget.channelName, null, 0);
   }
 
