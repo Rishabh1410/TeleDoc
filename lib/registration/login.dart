@@ -21,7 +21,7 @@ class _login_pageState extends State<login_page> {
 
   Future<String> authentication(String doc_Id) async {
     Map post_data = {'User': '2', 'Doctor_Id': '$doc_Id'};
-    http.Response check = await http.post('http://54.87.169.52:5000/signin',
+    http.Response check = await http.post('http://54.165.225.128:5000/signin',
         body: jsonEncode(post_data),
         headers: {"content-type": "application/json"});
     var auth_data = jsonDecode(check.body);

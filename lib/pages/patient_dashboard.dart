@@ -38,7 +38,7 @@ class _Patient_cardsState extends State<Patient_cards> {
   Future<Map<String, dynamic>> cardvalue(var pat_Id) async {
     Map<String, dynamic> pat_id = {'id': 78};
     final http.Response patientValue = await http.post(
-        'http://54.87.169.52:5000/get',
+        'http://54.165.225.128:5000/get',
         body: jsonEncode(pat_id),
         headers: {"content-type": "application/json"});
 

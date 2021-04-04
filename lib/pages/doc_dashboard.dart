@@ -114,7 +114,7 @@ class _TimelineState extends State<Timeline> {
     };
     print(day.substring(0, 23));
     final http.Response patientData = await http.post(
-        'http://54.87.169.52:5000/appointment_info',
+        'http://54.165.225.128:5000/appointment_info',
         body: jsonEncode(dataAtDate),
         headers: {"content-type": "application/json"});
 
