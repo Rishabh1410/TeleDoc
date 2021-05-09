@@ -8,19 +8,21 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class Patient_cards extends StatefulWidget {
-  Patient_cards({Key key}) : super(key: key);
+  var pat_Id;
+  Patient_cards({Key key,this.pat_Id}) : super(key: key);
 
   @override
   _Patient_cardsState createState() => _Patient_cardsState();
 }
 
-class _Patient_cardsState extends State<Patient_cards> {
+class _Patient_cardsState extends State<Patient_cards> with AutomaticKeepAliveClientMixin{
   final _channelController = TextEditingController();
   String channel;
   String token;
+
 
   /// if channel textField is validated to have error
   bool _validateError = false;
@@ -28,7 +30,9 @@ class _Patient_cardsState extends State<Patient_cards> {
 
   //made stream controller to get a stream of data
   //StreamController _flow = StreamController();
-  fetch_data() {
+  fetch_data() async{
+    // pref.setString('channel', 'temp');
+    // pref.setString('token', '00648977aeb5abe4b09b4ffcb004f36cda5IACaOvCnHSESY/SSOmkcej42jdkuxRFdLQuKSt2t6KiiXMqFUwsAAAAAEADBVZQ5qWZ1YAEAAQCpZnVg');
     channel = pref.getString('channel');
     token = pref.getString('token');
     print(channel);
@@ -36,9 +40,9 @@ class _Patient_cardsState extends State<Patient_cards> {
   }
 
   Future<Map<String, dynamic>> cardvalue(var pat_Id) async {
-    Map<String, dynamic> pat_id = {'id': 78};
+    Map<String, dynamic> pat_id = {'id': 1150200};
     final http.Response patientValue = await http.post(
-        'http://54.165.225.128:5000/get',
+        'http://54.162.56.164:5000/get',
         body: jsonEncode(pat_id),
         headers: {"content-type": "application/json"});
 
@@ -74,7 +78,7 @@ class _Patient_cardsState extends State<Patient_cards> {
 
   @override
   Widget build(BuildContext context) {
-    var pat_Id = ModalRoute.of(context).settings.arguments;
+    //var pat_Id = ModalRoute.of(context).settings.arguments;
     return Scaffold(
         body: Container(
       //color: Colors.white,
@@ -89,7 +93,7 @@ class _Patient_cardsState extends State<Patient_cards> {
       alignment: Alignment.center,
       width: MediaQuery.of(context).size.width * 1,
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
         child: ListView(
           padding: EdgeInsets.all(8),
           children: [
@@ -98,7 +102,7 @@ class _Patient_cardsState extends State<Patient_cards> {
             ListTile(
               leading: IconButton(
                 icon: Icon(
-                  Icons.video_call_sharp,
+                  AntDesign.videocamera,
                   color: Colors.blueAccent,
                   size: 40,
                   semanticLabel: 'call',
@@ -109,8 +113,8 @@ class _Patient_cardsState extends State<Patient_cards> {
                   onJoin(channel, token);
                 },
               ),
-              title: Text('data'),
-              subtitle: Text('data'),
+              title: Text('${widget.pat_Id[0]}'),
+              subtitle: Text('${widget.pat_Id[1]}'),
               trailing: CircleAvatar(
                 radius: 50,
                 backgroundImage: AssetImage('assets/images/default_image.png'),
@@ -124,8 +128,8 @@ class _Patient_cardsState extends State<Patient_cards> {
             ),
 
             Card(
-              color: Colors.blueAccent,
-              //Color.fromRGBO(245, 246, 250, 1),
+
+              color:Color.fromRGBO(245, 246, 250, 1),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
               ),
@@ -149,7 +153,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                 padding: const EdgeInsets.all(6.0),
                 child: Text(
                   'Patient Report',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,color: Colors.black87),
                 ),
               ),
             ),
@@ -158,7 +162,7 @@ class _Patient_cardsState extends State<Patient_cards> {
 
             FutureBuilder(
                 //StreamBuilder(
-                future: cardvalue(pat_Id),
+                future: cardvalue(widget.pat_Id),
                 //stream:
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.data == null) {
@@ -180,7 +184,7 @@ class _Patient_cardsState extends State<Patient_cards> {
                         children: [
                           Expanded(
                             child: Card(
-                              color: Colors.blueAccent,
+                              color: Colors.red[300],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -188,14 +192,23 @@ class _Patient_cardsState extends State<Patient_cards> {
                                 splashColor: Colors.blue.withAlpha(30),
                                 onTap: () {},
                                 child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      '${snapshot.data['Blood Pressure']}',
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:[Text(
+                                      'Blood Pressure',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                      Text(
+                                      '${snapshot.data['Blood Pressure'].toStringAsFixed(2)}',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 30),
-                                    ),
+                                    ),] 
                                   ),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(50)),
@@ -205,9 +218,11 @@ class _Patient_cardsState extends State<Patient_cards> {
                               ),
                             ),
                           ),
+
+
                           Expanded(
                             child: Card(
-                              color: Colors.blueAccent,
+                              color: Color.fromRGBO(147, 112, 255, 1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -215,72 +230,21 @@ class _Patient_cardsState extends State<Patient_cards> {
                                 splashColor: Colors.blue.withAlpha(30),
                                 onTap: () {},
                                 child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      '${snapshot.data['Body Temp']}',
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text(
+                                      'Body Temp',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),Text(
+                                      '${snapshot.data['Body Temp'].toStringAsFixed(2)}',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 30),
-                                    ),
-                                  ),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50)),
-                                  width: 150,
-                                  height: 200,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Card(
-                              color: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: InkWell(
-                                splashColor: Colors.blue.withAlpha(30),
-                                onTap: () {},
-                                child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      '${snapshot.data['Pulse']}',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30),
-                                    ),
-                                  ),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50)),
-                                  width: 150,
-                                  height: 200,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Card(
-                              color: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: InkWell(
-                                splashColor: Colors.blue.withAlpha(30),
-                                onTap: () {},
-                                child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      '${snapshot.data['Body weight']}',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30),
-                                    ),
+                                    ),]
                                   ),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(50)),
@@ -296,7 +260,41 @@ class _Patient_cardsState extends State<Patient_cards> {
                         children: [
                           Expanded(
                             child: Card(
-                              color: Colors.blueAccent,
+                              color: Color.fromRGBO(185, 126, 255, 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: InkWell(
+                                splashColor: Colors.black,
+                                onTap: () {},
+                                child: Container(
+                                  child: Column(
+mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text(
+                                      'Pulse',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),Text(
+                                      '${snapshot.data['Pulse'].toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30),
+                                    ),]
+                                  ),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50)),
+                                  width: 150,
+                                  height: 200,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Card(
+                              color: Color.fromRGBO(75, 87, 132, 1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
@@ -304,14 +302,59 @@ class _Patient_cardsState extends State<Patient_cards> {
                                 splashColor: Colors.blue.withAlpha(30),
                                 onTap: () {},
                                 child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      '${snapshot.data['Respiration Rate']}',
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text(
+                                      'Body weight',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),Text(
+                                      '${snapshot.data['Body weight'].toStringAsFixed(2)}',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 30),
-                                    ),
+                                    ),]
+                                  ),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50)),
+                                  width: 150,
+                                  height: 200,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Card(
+                              color: Color.fromRGBO(0, 123, 255, 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: InkWell(
+                                splashColor: Colors.blue.withAlpha(30),
+                                onTap: () {},
+                                child: Container(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text(
+                                      'Respiration Rate',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),Text(
+                                      '${snapshot.data['Respiration Rate'].toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30),
+                                    ),]
                                   ),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(50)),
@@ -331,14 +374,21 @@ class _Patient_cardsState extends State<Patient_cards> {
                                 splashColor: Colors.blue.withAlpha(30),
                                 onTap: () {},
                                 child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      '${snapshot.data['Blood Glucose']}',
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text(
+                                      'Blood Glucose',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),Text(
+                                      '${snapshot.data['Blood Glucose'].toStringAsFixed(2)}',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 30),
-                                    ),
+                                    ),]
                                   ),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(50)),
@@ -426,4 +476,8 @@ class _Patient_cardsState extends State<Patient_cards> {
     final status = await permission.request();
     print(status);
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

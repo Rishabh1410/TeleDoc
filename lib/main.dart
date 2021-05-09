@@ -1,4 +1,5 @@
 import 'package:TeleDoc/registration/login.dart';
+import 'package:TeleDoc/src/middle_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -6,15 +7,48 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:TeleDoc/pages/doc_dashboard.dart';
 import 'package:TeleDoc/pages/patient_dashboard.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:TeleDoc/local_data/data.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 SharedPreferences pref;
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  //SharedPreferences pref = await SharedPreferences.getInstance();
+  flutterLocalNotificationsPlugin.show(
+      message.data.hashCode,
+      message.data['title'],
+      message.data['patient_id'],
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channel.description,
+        ),
+      ));
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      await pref.setString('channel', message.data['channel']);
+      await pref.setString('token', message.data['Token']).then((value) => print('done.......................................'));
+  print('Handling a background message ${message.messageId}');
+  print(message.data);
+}
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  'This channel is used for important notifications.', // description
+  importance: Importance.high,
+);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
   pref = await SharedPreferences.getInstance();
+  await Firebase.initializeApp();
 
   runApp(MyApp());
 }
@@ -26,10 +60,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   var mssg;
-  FirebaseMessaging _firebasemessaging = FirebaseMessaging();
+  FirebaseMessaging _firebasemessaging = FirebaseMessaging.instance;
+
+  
+
   Future<void> authentication(String token) async {
-    Map post_data = {'User': '2', 'Doctor_Id': '5437', 'deviceToken': '$token'};
-    http.Response check = await http.post('http://54.87.169.52:5000/signin',
+    Map post_data = {'User': '2', 'Doctor_Id': '9026', 'deviceToken': '$token'};
+    http.Response check = await http.post('http://54.162.56.164:5000/signin',
         body: jsonEncode(post_data),
         headers: {"content-type": "application/json"});
     var auth_data = jsonDecode(check.body);
@@ -41,53 +78,53 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
     _firebasemessaging.getToken().then((token) {
-      print(token);
-      authentication(token); // Print the Token in Console
+      authentication(token).then((value) => print('hii')); // Print the Token in Console
     });
     //Id = getData('doc_Id');
-    _firebasemessaging.configure(onMessage: (message) async {
+    var initialzationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettings =
+        InitializationSettings(android: initialzationSettingsAndroid);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("1");
-      mssg = message['notification']['body'];
-      print(mssg);
 
-      pref.setString("channel", "${mssg.substring(44, 49)}");
-      pref.setString("token", "${mssg.substring(58)}");
-      FlutterRingtonePlayer.play(
-        android: AndroidSounds.notification,
-        ios: IosSounds.bell,
-        //looping: true,
-        volume: 1.0,
-      );
+      await pref.setString("channel", message.data['channel']).then((value) => print('saved    1   .....................'));
+      await pref.setString("token", message.data['Token']);
+
+      flutterLocalNotificationsPlugin.show(
+            message.data.hashCode,
+            message.data['title'],
+            message.data['patient_id'],
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+              ),
+            ));
+
+      // FlutterRingtonePlayer.play(
+      //   android: AndroidSounds.notification,
+      //   ios: IosSounds.bell,
+      //   //looping: true,
+      //   volume: 1.0,
+      // );
       //print(message);
-    }, onResume: (message) async {
-      print("2");
-      mssg = message['notification']['body'];
-      print(mssg);
-
-      pref.setString("channel", "${mssg.substring(44, 49)}");
-      pref.setString("token", "${mssg.substring(58)}");
-      FlutterRingtonePlayer.play(
-        android: AndroidSounds.notification,
-        ios: IosSounds.bell,
-        //looping: true,
-        volume: 1.0,
-      );
-    }, onLaunch: (message) async {
-      print("3");
-      mssg = message['notification']['body'];
-      print(mssg);
-
-      pref.setString("channel", "${mssg.substring(44, 49)}");
-      pref.setString("token", "${mssg.substring(58)}");
-
-      FlutterRingtonePlayer.play(
-        android: AndroidSounds.notification,
-        ios: IosSounds.bell,
-        //looping: true,
-        volume: 1.0,
-      );
     });
+  
+     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async { print("2");
+
+      // pref.setString("channel", "${mssg.substring(44, 49)}");
+      // pref.setString("token", "${mssg.substring(58)}");
+
+        Navigator.pushNamed(
+            this.context,'/middle',
+            //Patient_cards(),
+            arguments: [message.data['patient_id'],message.data['clinic_id']]);
+      });
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
@@ -95,35 +132,36 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      // Initialize FlutterFire:
-      future: _initialization,
-      builder: (context, snapshot) {
-        // Check for errors
-        if (snapshot.hasError) {
-          print('{$snapshot.error}');
-        }
+        // Initialize FlutterFire:
+        future: _initialization,
+        builder: (context, snapshot) {
+    // Check for errors
+    if (snapshot.hasError) {
+      print('{$snapshot.error}');
+    }
 
-        // Once complete, show your application
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            title: "teledoc",
-            routes: {
-              '/login': (context) => login_page(),
-              //'/reg': (context) => DoctorReg(),
-              '/dashboard': (context) => Timeline(),
-              '/patients': (context) => Patient_cards(),
-            },
-            theme: ThemeData(
-                brightness: Brightness.light,
-                primaryColor: Color.fromRGBO(148, 113, 254, 1)),
-            home: MyHomePage(title: 'teledoc'),
-          );
-        }
+    // Once complete, show your application
+    if (snapshot.connectionState == ConnectionState.done) {
+      return MaterialApp(
+        title: "teledoc",
+        routes: {
+          '/middle':(context)=> nav_bar(),
+          '/login': (context) => login_page(),
+          //'/reg': (context) => DoctorReg(),
+          '/dashboard': (context) => Timeline(),
+          '/patients': (context) => Patient_cards(),
+        },
+        theme: ThemeData(
+            brightness: Brightness.light,
+            primaryColor: Color.fromRGBO(148, 113, 254, 1)),
+        home: MyHomePage(title: 'teledoc'),
+      );
+    }
 
-        // Otherwise, show something whilst waiting for initialization to complete
-        return (CircularProgressIndicator());
-      },
-    );
+    // Otherwise, show something whilst waiting for initialization to complete
+    return (CircularProgressIndicator());
+        },
+      );
   }
 }
 

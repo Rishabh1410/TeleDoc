@@ -16,3 +16,6 @@
 //   final SharedPreferences data = await _data;
 //   data.remove(key);
 // }
+
+
+const String ip = 'http://54.162.56.164:5000';

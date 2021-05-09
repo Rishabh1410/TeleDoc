@@ -4,6 +4,9 @@ import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:flutter/material.dart';
 import 'package:TeleDoc/src/utils/settings.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/src/foundation/node.dart';
+import 'package:flutter/src/foundation/diagnostics.dart';
 
 // const APP_ID = '48977aeb5abe4b09b4ffcb004f36cda5';
 // const Token =
@@ -25,11 +28,12 @@ class CallPage extends StatefulWidget {
   _CallPageState createState() => _CallPageState();
 }
 
-class _CallPageState extends State<CallPage> {
+class _CallPageState extends State<CallPage> with AutomaticKeepAliveClientMixin{
   final _users = <int>[];
   final _infoStrings = <String>[];
   bool muted = false;
   RtcEngine _engine;
+  int flag = 1;
 
   @override
   void dispose() {
@@ -38,6 +42,7 @@ class _CallPageState extends State<CallPage> {
     // destroy sdk
     _engine.leaveChannel();
     _engine.destroy();
+    print("end...............................................");
     super.dispose();
   }
 
@@ -138,7 +143,7 @@ class _CallPageState extends State<CallPage> {
 
   /// Video view wrapper
   Widget _videoView(view) {
-    return Expanded(child: Container(child: view));
+    return Container(child: view);
   }
 
   /// Video view row wrapper
@@ -163,10 +168,16 @@ class _CallPageState extends State<CallPage> {
         ));
       case 2:
         return Container(
-            child: Column(
+            child: Stack(
+              fit: StackFit.expand,
+              alignment: Alignment.topLeft,
           children: <Widget>[
-            _expandedVideoRow([views[0]]),
-            _expandedVideoRow([views[1]])
+            Container(child: _videoView(views[1])),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.3,
+              width: MediaQuery.of(context).size.width * 0.3,
+              //alignment: Alignment(0.0, 0.0)
+              child: Expanded(child: _videoView(views[0])))
           ],
         ));
       case 3:
@@ -183,6 +194,25 @@ class _CallPageState extends State<CallPage> {
           children: <Widget>[
             _expandedVideoRow(views.sublist(0, 2)),
             _expandedVideoRow(views.sublist(2, 4))
+          ],
+        ));
+        case 5:
+        return Container(
+            child: Column(
+          children: <Widget>[
+            _expandedVideoRow(views.sublist(0, 2)),
+            _expandedVideoRow(views.sublist(2, 4)),
+            _expandedVideoRow(views.sublist(4, 5)),
+          ],
+        ));
+        case 6:
+        return Container(
+            child: Column(
+          children: <Widget>[
+            _expandedVideoRow(views.sublist(0, 2)),
+            _expandedVideoRow(views.sublist(2, 4)),
+            _expandedVideoRow(views.sublist(4, 6)),
+            //_videoView(views[1])
           ],
         ));
       default:
@@ -213,7 +243,7 @@ class _CallPageState extends State<CallPage> {
             padding: const EdgeInsets.all(12.0),
           ),
           RawMaterialButton(
-            onPressed: () => _onCallEnd(context),
+            onPressed: () => _onCallEnd(),
             child: Icon(
               Icons.call_end,
               color: Colors.white,
@@ -243,6 +273,7 @@ class _CallPageState extends State<CallPage> {
 
   /// Info panel to show logs
   Widget _panel() {
+    final views = _getRenderViews();
     print("success 5");
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 48),
@@ -267,17 +298,20 @@ class _CallPageState extends State<CallPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Flexible(
+                      
                       child: Container(
+                        
                         padding: const EdgeInsets.symmetric(
                           vertical: 2,
                           horizontal: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.yellowAccent,
+                          
+                          color: Color.fromRGBO(255, 255, 255, 0.4),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
-                          _infoStrings[index],
+                          '${_infoStrings[index]}   ${views.length}',
                           style: TextStyle(color: Colors.blueGrey),
                         ),
                       ),
@@ -292,8 +326,16 @@ class _CallPageState extends State<CallPage> {
     );
   }
 
-  void _onCallEnd(BuildContext context) {
-    Navigator.pop(context);
+  void _onCallEnd() {
+    //Navigator.pop(context);
+     _users.clear();
+    // destroy sdk
+    _engine.leaveChannel();
+    _engine.destroy();
+    print("end...............................................");
+    setState(() {
+      flag = 0;
+    });
   }
 
   void _onToggleMute() {
@@ -314,20 +356,34 @@ class _CallPageState extends State<CallPage> {
   @override
   Widget build(BuildContext context) {
     print("success 0");
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Agora Flutter QuickStart'),
-      ),
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Stack(
-          children: <Widget>[
-            _viewRows(),
-            _panel(),
-            _toolbar(),
-          ],
+    if(flag == 1){
+      return MaterialApp(
+          home: Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Stack(
+            children: <Widget>[
+              _viewRows(),
+              _panel(),
+              _toolbar(),
+            ],
+          ),
         ),
       ),
-    );
+    );}
+
+
+    
+    else{return MaterialApp(home:Scaffold(body:Center(child: FlatButton(child: Text('Restart video call'),onPressed:()async{
+      await initialize();
+      setState(() {
+      flag = 1;
+    });},),)));}
   }
+
+  
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

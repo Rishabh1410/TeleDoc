@@ -40,9 +40,13 @@ dependencies:
   image_gallery_saver: ^1.6.7
   path:
   shared_preferences: ^0.5.12+4
-  firebase_messaging: ^7.0.3
+  firebase_messaging: ^8.0.0-dev.10
   flutter_ringtone_player: ^2.0.0
   cloud_firestore: ^0.14.4
+  flutter_icons: ^1.1.0
+  google_fonts: ^1.1.2
+  flutter_local_notifications: ^4.0.1+2
+  
 
 
 

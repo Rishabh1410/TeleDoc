@@ -16,6 +16,7 @@
     <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 
    <application
+        android:name=".Application"
         android:label="project"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
@@ -65,6 +66,6 @@
             android:value="2" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="default_notification_channel_id"/>
+            android:value="high_importance_channel"/>
     </application>
 </manifest>

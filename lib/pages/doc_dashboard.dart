@@ -1,3 +1,4 @@
+import 'package:TeleDoc/src/middle_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:table_calendar/table_calendar.dart';
@@ -7,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:TeleDoc/pages/patient_dashboard.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class Timeline extends StatefulWidget {
   @override
@@ -50,51 +53,42 @@ class _TimelineState extends State<Timeline> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)),
                 child: Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.fromLTRB(1, 10, 10, 10),
                   child: ListTile(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     tileColor: Color.fromRGBO(255, 255, 255, 1),
-                    leading: Column(
-                      children: [
-                        Text(
-                          '${snapshot.data[index][6].toString().substring(0, 2)}',
-                          style: TextStyle(
-                              color: Color.fromRGBO(148, 113, 254, 1),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24),
-                        ),
-                        Text(
-                          '${snapshot.data[index][6].toString().substring(3, 5)}',
-                          style: TextStyle(
-                              color: Color.fromRGBO(148, 113, 254, 1),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24),
-                        ),
-                      ],
+                    leading: Text(
+                      '${snapshot.data[index][6].toString().substring(0, 2)}:${snapshot.data[index][6].toString().substring(3, 5)}',
+                      style: GoogleFonts.bebasNeue(textStyle:TextStyle(
+                          color: Color.fromRGBO(75, 87, 132, 1),
+                          //Color.fromRGBO(148, 113, 254, 1),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30)),
                     ),
                     trailing: (IconButton(
                       icon: Icon(Icons.menu),
                       iconSize: 40,
                       onPressed: () {},
                     )),
-                    title: Text('${snapshot.data[index][1]}',
-                        style: TextStyle(
+                    title: Text('patient ID : ${snapshot.data[index][1]}',
+                        style: GoogleFonts.lato(textStyle:TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18)),
-                    subtitle: Text('${snapshot.data[index][2]}',
-                        style: TextStyle(
+                            fontSize: 18))),
+                    subtitle: Text('clinic ID : ${snapshot.data[index][2]}',
+                        style: GoogleFonts.lato(textStyle:TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18)),
+                            fontSize: 18))),
                     onTap: () => {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Patient_cards(),
+                              builder: (context) => nav_bar(),
+                              //Patient_cards(),
                               settings: RouteSettings(
-                                  arguments: snapshot.data[index][1]),
+                                  arguments: [snapshot.data[index][1],snapshot.data[index][2]]),
                               fullscreenDialog: true))
                     },
                   ),
@@ -114,7 +108,7 @@ class _TimelineState extends State<Timeline> {
     };
     print(day.substring(0, 23));
     final http.Response patientData = await http.post(
-        'http://54.165.225.128:5000/appointment_info',
+        'http://54.162.56.164:5000/appointment_info',
         body: jsonEncode(dataAtDate),
         headers: {"content-type": "application/json"});
 
@@ -159,74 +153,80 @@ class _TimelineState extends State<Timeline> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 30,
-              ),
-              TableCalendar(
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                initialCalendarFormat: CalendarFormat.week,
-                calendarStyle: CalendarStyle(
-                    weekdayStyle: dayStyle(FontWeight.normal),
-                    weekendStyle: dayStyle(FontWeight.normal),
-                    selectedColor: Color.fromRGBO(148, 113, 254, 1),
-                    todayColor: Colors.black38),
-                daysOfWeekStyle: DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(
-                        color: Color(0xff30384c),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                    weekendStyle: TextStyle(
-                        color: Color(0xff30384c),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                    dowTextBuilder: (date, locale) {
-                      return DateFormat.E(locale).format(date).substring(0, 1);
-                    }),
-                onDaySelected: (day, events, holyday) => {
-                  value = listUI(day.toString()),
-                },
-                onCalendarCreated: (first, last, format) =>
-                    value = listUI(_controller.focusedDay.toString()),
-                headerStyle: HeaderStyle(
-                    formatButtonDecoration: BoxDecoration(
-                      color: Color.fromRGBO(148, 113, 254, 1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    formatButtonVisible: true,
-                    centerHeaderTitle: true,
-                    titleTextStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 30,
+            ),
+            TableCalendar(
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              initialCalendarFormat: CalendarFormat.week,
+              calendarStyle: CalendarStyle(
+                
+                  weekdayStyle: dayStyle(FontWeight.normal),
+                  weekendStyle: dayStyle(FontWeight.normal),
+                  selectedColor: Color.fromRGBO(75, 87, 132, 1),
+                  //selectedColor: Color.fromRGBO(148, 113, 254, 1),
+                  todayColor: Colors.black38),
+                  
+              daysOfWeekStyle: DaysOfWeekStyle(
+                  weekdayStyle: TextStyle(
+                      color: Color(0xff30384c),
                       fontWeight: FontWeight.bold,
-                    ),
-                    formatButtonTextStyle: TextStyle(color: Colors.white),
-                    formatButtonShowsNext: false,
-                    leftChevronIcon: Icon(
-                      Icons.chevron_left,
+                      fontSize: 16),
+                  weekendStyle: TextStyle(
                       color: Color(0xff30384c),
-                    ),
-                    rightChevronIcon: Icon(
-                      Icons.chevron_right,
-                      color: Color(0xff30384c),
-                    )),
-                calendarController: _controller,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                  dowTextBuilder: (date, locale) {
+                    return DateFormat.E(locale).format(date).substring(0, 1);
+                  }),
+              onDaySelected: (day, events, holyday) => {
+                value = listUI(day.toString()),
+              },
+              onCalendarCreated: (first, last, format) =>
+                  value = listUI(_controller.focusedDay.toString()),
+              headerStyle: HeaderStyle(
+                  formatButtonDecoration: BoxDecoration(
+                    color: Color.fromRGBO(75, 87, 132, 1),
+                    //color: Color.fromRGBO(148, 113, 254, 1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  formatButtonVisible: false,
+                  centerHeaderTitle: true,
+                  titleTextStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  formatButtonTextStyle: TextStyle(color: Colors.white),
+                  formatButtonShowsNext: false,
+                  leftChevronIcon: Icon(
+                    Icons.chevron_left,
+                    color: Color(0xff30384c),
+                  ),
+                  rightChevronIcon: Icon(
+                    Icons.chevron_right,
+                    color: Color(0xff30384c),
+                  )),
+              calendarController: _controller,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Expanded(
+                          child: Container(
                   padding: EdgeInsets.only(left: 6, right: 6, top: 6),
                   width: MediaQuery.of(context).size.width * 1,
-                  height: MediaQuery.of(context).size.height * 1,
+                  //height: MediaQuery.of(context).size.height * 1,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular((25)),
                           topRight: Radius.circular(25),
                           bottomRight: Radius.circular(0)),
-                      color: Color.fromRGBO(148, 113, 254, 1)),
+                      color: Color.fromRGBO(75, 87, 132, 1),
+                      //color: Color.fromRGBO(148, 113, 254, 1)
+                      ),
                   child: value
                   //Stack(
                   //   children: <Widget>[
@@ -283,9 +283,9 @@ class _TimelineState extends State<Timeline> {
                   //     )
                   //   ],
                   // ),
-                  )
-            ],
-          ),
+                  ),
+            )
+          ],
         ),
       ),
     );

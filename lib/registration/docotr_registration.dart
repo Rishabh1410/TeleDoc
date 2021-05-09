@@ -78,7 +78,7 @@ class _DoctorRegState extends State<DoctorReg> {
 
   Future<void> create_post(Map<String, dynamic> data) async {
     final http.Response response = await http.post(
-        'http://54.165.225.128:5000/signup',
+        'http://54.162.56.164:5000/signup',
         body: jsonEncode(data),
         headers: {"content-type": "application/json"});
 
