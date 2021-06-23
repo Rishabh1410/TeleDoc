@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:TeleDoc/main.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
